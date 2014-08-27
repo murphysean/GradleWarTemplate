@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+	<!-- Read more about context.xml here http://tomcat.apache.org/tomcat-7.0-doc/config/context.html -->
+	<!-- Read more about jndi here: http://tomcat.apache.org/tomcat-7.0-doc/jndi-resources-howto.html -->
+
+	<Parameter
+			name="groupId"
+			description="Maven Group ID"
+			value="${pom.groupId}"
+			override="false"/>
+	<Parameter
+			name="artifactId"
+			description="Maven Artifact ID"
+			value="${pom.artifactId}"
+			override="false"/>
+	<Parameter
+			name="name"
+			description="Maven Pom Name"
+			value="${pom.name}"
+			override="false"/>
+	<Parameter
+			name="description"
+			description="Maven Pom Description"
+			value="${pom.description}"
+			override="false"/>
+	<Parameter
+			name="version"
+			description="Maven Pom Version"
+			value="${pom.version}"
+			override="false"/>
+	<Parameter
+			name="revision"
+			description="Git Revision"
+			value="${git.revision}"
+			override="false"/>
+	<Parameter
+			name="status"
+			description="Git Status"
+			value="${git.status}"
+			override="false"/>
+	<Parameter
+			name="user"
+			description="Git User Name"
+			value="${git.user.name}"
+			override="false"/>
+	<Parameter
+			name="user"
+			description="Git User Email"
+			value="${git.user.email}"
+			override="false"/>
+
+	<!--<Environment
+		name="tokenInfoEndpoint"
+		description="This is the endpoint that is used to validate tokens"
+		override="false"
+		type="java.lang.String"
+		value="https://auth.example.com/oauth2/tokeninfo"/>-->
+
+	<!--<Resource
+		name="jdbc/example"
+		auth="Container"
+		driverClassName="com.mysql.jdbc.Driver"
+		initialSize="0"
+		maxActive="15"
+		maxIdle="3"
+		minIdle="0"
+		maxWait="-1"
+		validationQuery="SELECT 1"
+		testOnBorrow="true"
+		removeAbandoned="true"
+		removeAbandonedTimeout="60"
+		username="username"
+		password="password"
+		type="javax.sql.DataSource"
+		url="jdbc:mysql://db.example.com:3306/schema?useUnicode=yes&#038;characterEncoding=UTF-8"/>-->
+
+	<!--<Resource
+		name="jdbc/example"
+		auth="Container"
+		driverClassName="org.sqlite.JDBC"
+		initialSize="0"
+		maxActive="15"
+		maxIdle="3"
+		minIdle="0"
+		maxWait="-1"
+		validationQuery="SELECT 1"
+		connectionInitSqls="PRAGMA foreign_keys = ON"
+		testOnBorrow="true"
+		removeAbandoned="true"
+		removeAbandonedTimeout="60"
+		username="username"
+		password="password"
+		type="javax.sql.DataSource"
+		url="jdbc:sqlite:/path/to/sqlite/file/example.db"/>-->
+</Context>

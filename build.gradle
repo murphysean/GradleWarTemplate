@@ -1,0 +1,100 @@
+apply plugin: 'war'
+
+project.sourceCompatibility = 1.8
+project.version = '0.0.0'
+project.ext.set("pom", ['groupId'    : 'com.example',
+						'artifactId' : 'template',
+						'name'       : "GradleWarTemplate",
+						'description': "This is a template project to bootstrap getting a Java8, Tomcat8, Jersey2, Jackson2",
+						'version'    : version])
+project.ext.set("catalina", ['base': '${catalina.base}'])
+project.ext.set("timestamp", (int) (new Date().getTime() / 1000))
+project.ext.set("git", ["revision": "git rev-parse --short HEAD".execute().text.trim(),
+						"status"  : "git status --short".execute().text,
+						"user"    : [
+								"name" : "git config user.name".execute().text.trim(),
+								"email": "git config user.email".execute().text.trim()]])
+
+project.ext.set("expandMap", ['pom': project.pom, 'catalina': project.catalina, 'version': project.version, 'git': project.git, 'timestamp': project.timestamp])
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	//SERVLET 3.1, TOMCAT 8
+	providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+	//SQLite Xerial
+	compile 'org.xerial:sqlite-jdbc:3.7.15-M1'
+	//APACHE COMMONS
+	compile 'commons-io:commons-io:2.4'
+	//compile 'commons-dbutils:commons-dbutils:1.5'
+	//compile 'org.apache.commons:commons-exec:1.2'
+	//compile 'org.apache.commons:commons-math3:3.2'
+	compile 'org.apache.commons:commons-lang3:3.2.1'
+
+	//JERSEY 2
+	compile('org.glassfish.jersey.core:jersey-client:2.+')
+	compile('org.glassfish.jersey.containers:jersey-container-servlet:2.+')
+	//JERSEY JACKSON MODULE
+	compile('org.glassfish.jersey.media:jersey-media-json-jackson:2.+') {
+		exclude group: 'org.codehaus.jackson'
+	}
+	//JACKSON 2 JSON
+	compile 'com.fasterxml.jackson.core:jackson-core:2.+'
+	compile 'com.fasterxml.jackson.core:jackson-annotations:2.+'
+	compile 'com.fasterxml.jackson.core:jackson-databind:2.+'
+	compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.+'
+	compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-xml-provider:2.+'
+	testCompile 'junit:junit:4.11'
+}
+
+war {
+	//${baseName}-${appendix}-${version}-${classifier}.${extension}
+	def (major, minor, bugfix) = project.version.tokenize('.');
+	major = major.size() == 1 ? "0" + major : major
+	minor = minor.size() == 1 ? "0" + minor : minor
+	bugfix = bugfix.size() == 1 ? "0" + bugfix : bugfix
+	archiveName = "${baseName.toLowerCase()}##${major}${minor}${bugfix}.${extension}"
+	from 'build/war'
+	duplicatesStrategy = 'include'
+}
+
+task copyContextXml(type: Copy) {
+	from 'src/main/config'
+	include 'context.xml'
+	into 'build/war/META-INF'
+	expand(project.expandMap)
+}
+
+task copyWebXml(type: Copy) {
+	from 'src/main/config'
+	include 'web.xml'
+	into 'build/war/WEB-INF'
+	expand(project.expandMap)
+}
+
+task copyLoggingProperties(type: Copy) {
+	from 'src/main/config'
+	include 'logging.properties'
+	into 'build/war/WEB-INF/classes'
+	expand(project.expandMap)
+}
+
+war.dependsOn copyContextXml, copyWebXml, copyLoggingProperties
+
+task deploy(type: Copy, dependsOn: war) {
+	from 'build/libs'
+	into '/home/sean/Public/tomcat/webapps'
+}
+
+task undeploy(type: Delete) {
+	def (major, minor, bugfix) = project.version.tokenize('.');
+	major = major.size() == 1 ? "0" + major : major
+	minor = minor.size() == 1 ? "0" + minor : minor
+	bugfix = bugfix.size() == 1 ? "0" + bugfix : bugfix
+	def extension = 'war'
+	def archiveName = "${project.archivesBaseName.toLowerCase()}##${major}${minor}${bugfix}.${extension}"
+	delete '/home/sean/Public/tomcat/webapps/' + archiveName
+}
+
